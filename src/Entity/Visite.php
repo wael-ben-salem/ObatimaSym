@@ -4,72 +4,102 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\VisiteRepository;
-
-#[ORM\Entity(repositoryClass: VisiteRepository::class)]
+/**
+ * Visite
+ */
 #[ORM\Table(name: 'visite')]
+#[ORM\Index(name: 'Id_terrain', columns: ['Id_terrain'])]
+#[ORM\Index(name: 'Id_projet', columns: ['Id_projet'])]
+#[ORM\Entity]
 class Visite
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'Id_visite', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $IdVisite = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idVisite;
+
+    /**
+     * @var \DateTime
+     */
+    #[ORM\Column(name: 'dateVisite', type: 'date', nullable: false)]
+    private $datevisite;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'observations', type: 'string', length: 200, nullable: true)]
+    private $observations;
+
+    /**
+     * @var \Projet
+     */
+    #[ORM\JoinColumn(name: 'Id_projet', referencedColumnName: 'Id_projet')]
+    #[ORM\ManyToOne(targetEntity: \Projet::class)]
+    private $idProjet;
+
+    /**
+     * @var \Terrain
+     */
+    #[ORM\JoinColumn(name: 'Id_terrain', referencedColumnName: 'Id_terrain')]
+    #[ORM\ManyToOne(targetEntity: \Terrain::class)]
+    private $idTerrain;
 
     public function getIdVisite(): ?int
     {
-        return $this->IdVisite;
+        return $this->idVisite;
     }
 
-    public function setIdVisite(int $IdVisite): self
+    public function getDatevisite(): ?\DateTimeInterface
     {
-        $this->IdVisite = $IdVisite;
+        return $this->datevisite;
+    }
+
+    public function setDatevisite(\DateTimeInterface $datevisite): static
+    {
+        $this->datevisite = $datevisite;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'date', nullable: false)]
-    private ?\DateTimeInterface $dateVisite = null;
-
-    public function getDateVisite(): ?\DateTimeInterface
-    {
-        return $this->dateVisite;
-    }
-
-    public function setDateVisite(\DateTimeInterface $dateVisite): self
-    {
-        $this->dateVisite = $dateVisite;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $observations = null;
 
     public function getObservations(): ?string
     {
         return $this->observations;
     }
 
-    public function setObservations(?string $observations): self
+    public function setObservations(?string $observations): static
     {
         $this->observations = $observations;
+
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: Terrain::class, inversedBy: 'visites')]
-    #[ORM\JoinColumn(name: 'IdTerrain', referencedColumnName: 'Id_terrain')]
-    private ?Terrain $terrain = null;
-
-    public function getTerrain(): ?Terrain
+    public function getIdProjet(): ?Projet
     {
-        return $this->terrain;
+        return $this->idProjet;
     }
 
-    public function setTerrain(?Terrain $terrain): self
+    public function setIdProjet(?Projet $idProjet): static
     {
-        $this->terrain = $terrain;
+        $this->idProjet = $idProjet;
+
         return $this;
     }
+
+    public function getIdTerrain(): ?Terrain
+    {
+        return $this->idTerrain;
+    }
+
+    public function setIdTerrain(?Terrain $idTerrain): static
+    {
+        $this->idTerrain = $idTerrain;
+
+        return $this;
+    }
+
 
 }

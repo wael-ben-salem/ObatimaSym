@@ -1,4 +1,7 @@
 import './bootstrap.js';
+import './builerz-master/css/style.css';
+import './builerz-master/js/main.js';
+
 /*
  * Welcome to your app's main JavaScript file!
  *

@@ -3,142 +3,158 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\ArticleRepository;
-
-#[ORM\Entity(repositoryClass: ArticleRepository::class)]
+/**
+ * Article
+ */
 #[ORM\Table(name: 'article')]
+#[ORM\Index(name: 'fournisseur_id', columns: ['fournisseur_id'])]
+#[ORM\Index(name: 'etapeprojet_id', columns: ['etapeprojet_id'])]
+#[ORM\Index(name: 'stock_id', columns: ['stock_id'])]
+#[ORM\Entity]
 class Article
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $id;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'nom', type: 'string', length: 255, nullable: false)]
+    private $nom;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'description', type: 'string', length: 500, nullable: true)]
+    private $description;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'prix_unitaire', type: 'string', length: 50, nullable: true)]
+    private $prixUnitaire;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'photo', type: 'string', length: 255, nullable: true)]
+    private $photo;
+
+    /**
+     * @var \Etapeprojet
+     */
+    #[ORM\JoinColumn(name: 'etapeprojet_id', referencedColumnName: 'Id_etapeProjet')]
+    #[ORM\ManyToOne(targetEntity: \Etapeprojet::class)]
+    private $etapeprojet;
+
+    /**
+     * @var \Stock
+     */
+    #[ORM\JoinColumn(name: 'stock_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \Stock::class)]
+    private $stock;
+
+    /**
+     * @var \Fournisseur
+     */
+    #[ORM\JoinColumn(name: 'fournisseur_id', referencedColumnName: 'fournisseur_id')]
+    #[ORM\ManyToOne(targetEntity: \Fournisseur::class)]
+    private $fournisseur;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
     public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $description = null;
 
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $prix_unitaire = null;
-
-    public function getPrix_unitaire(): ?string
+    public function getPrixUnitaire(): ?string
     {
-        return $this->prix_unitaire;
+        return $this->prixUnitaire;
     }
 
-    public function setPrix_unitaire(?string $prix_unitaire): self
+    public function setPrixUnitaire(?string $prixUnitaire): static
     {
-        $this->prix_unitaire = $prix_unitaire;
+        $this->prixUnitaire = $prixUnitaire;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $photo = null;
 
     public function getPhoto(): ?string
     {
         return $this->photo;
     }
 
-    public function setPhoto(?string $photo): self
+    public function setPhoto(?string $photo): static
     {
         $this->photo = $photo;
+
         return $this;
     }
-
-    #[ORM\ManyToOne(targetEntity: Stock::class, inversedBy: 'articles')]
-    #[ORM\JoinColumn(name: 'stock_id', referencedColumnName: 'id')]
-    private ?Stock $stock = null;
-
-    public function getStock(): ?Stock
-    {
-        return $this->stock;
-    }
-
-    public function setStock(?Stock $stock): self
-    {
-        $this->stock = $stock;
-        return $this;
-    }
-
-    #[ORM\ManyToOne(targetEntity: Fournisseur::class, inversedBy: 'articles')]
-    #[ORM\JoinColumn(name: 'fournisseur_id', referencedColumnName: 'id')]
-    private ?Fournisseur $fournisseur = null;
-
-    public function getFournisseur(): ?Fournisseur
-    {
-        return $this->fournisseur;
-    }
-
-    public function setFournisseur(?Fournisseur $fournisseur): self
-    {
-        $this->fournisseur = $fournisseur;
-        return $this;
-    }
-
-    #[ORM\ManyToOne(targetEntity: Etapeprojet::class, inversedBy: 'articles')]
-    #[ORM\JoinColumn(name: 'etapeprojet_id', referencedColumnName: 'Id_etapeProjet')]
-    private ?Etapeprojet $etapeprojet = null;
 
     public function getEtapeprojet(): ?Etapeprojet
     {
         return $this->etapeprojet;
     }
 
-    public function setEtapeprojet(?Etapeprojet $etapeprojet): self
+    public function setEtapeprojet(?Etapeprojet $etapeprojet): static
     {
         $this->etapeprojet = $etapeprojet;
-        return $this;
-    }
-
-    public function getPrixUnitaire(): ?string
-    {
-        return $this->prix_unitaire;
-    }
-
-    public function setPrixUnitaire(?string $prix_unitaire): static
-    {
-        $this->prix_unitaire = $prix_unitaire;
 
         return $this;
     }
+
+    public function getStock(): ?Stock
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?Stock $stock): static
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getFournisseur(): ?Fournisseur
+    {
+        return $this->fournisseur;
+    }
+
+    public function setFournisseur(?Fournisseur $fournisseur): static
+    {
+        $this->fournisseur = $fournisseur;
+
+        return $this;
+    }
+
 
 }

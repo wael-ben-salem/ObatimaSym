@@ -3,42 +3,34 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\GestionnairestockRepository;
-
-#[ORM\Entity(repositoryClass: GestionnairestockRepository::class)]
+/**
+ * Gestionnairestock
+ */
 #[ORM\Table(name: 'gestionnairestock')]
+#[ORM\Entity]
 class Gestionnairestock
 {
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'gestionnairestocks')]
+    /**
+     * @var \Utilisateur
+     */
     #[ORM\JoinColumn(name: 'gestionnairestock_id', referencedColumnName: 'id')]
-    private ?Utilisateur $utilisateur = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\OneToOne(targetEntity: \Utilisateur::class)]
+    private $gestionnairestock;
 
-    public function getUtilisateur(): ?Utilisateur
+    public function getGestionnairestock(): ?Utilisateur
     {
-        return $this->utilisateur;
+        return $this->gestionnairestock;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self
+    public function setGestionnairestock(?Utilisateur $gestionnairestock): static
     {
-        $this->utilisateur = $utilisateur;
+        $this->gestionnairestock = $gestionnairestock;
+
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: Equipe::class, mappedBy: 'gestionnairestock')]
-    private ?Equipe $equipe = null;
-
-    public function getEquipe(): ?Equipe
-    {
-        return $this->equipe;
-    }
-
-    public function setEquipe(?Equipe $equipe): self
-    {
-        $this->equipe = $equipe;
-        return $this;
-    }
 
 }

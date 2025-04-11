@@ -4,237 +4,195 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\ProjetRepository;
-
-#[ORM\Entity(repositoryClass: ProjetRepository::class)]
+/**
+ * Projet
+ */
 #[ORM\Table(name: 'projet')]
+#[ORM\Index(name: 'id_client', columns: ['id_client'])]
+#[ORM\Index(name: 'Id_terrain', columns: ['Id_terrain'])]
+#[ORM\Index(name: 'Id_equipe', columns: ['Id_equipe'])]
+#[ORM\UniqueConstraint(name: 'nomProjet', columns: ['nomProjet'])]
+#[ORM\Entity]
 class Projet
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'Id_projet', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $Id_projet = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idProjet;
 
-    public function getId_Projet(): ?int
-    {
-        return $this->Id_projet;
-    }
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'type', type: 'string', length: 20, nullable: false)]
+    private $type;
 
-    public function setId_projet(int $Id_projet): self
-    {
-        $this->Id_projet = $Id_projet;
-        return $this;
-    }
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'styleArch', type: 'string', length: 20, nullable: true)]
+    private $stylearch;
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nomProjet = null;
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'budget', type: 'decimal', precision: 15, scale: 3, nullable: false)]
+    private $budget;
 
-    public function getNomProjet(): ?string
-    {
-        return $this->nomProjet;
-    }
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'etat', type: 'string', length: 20, nullable: true)]
+    private $etat;
 
-    public function setNomProjet(string $nomProjet): self
-    {
-        $this->nomProjet = $nomProjet;
-        return $this;
-    }
+    /**
+     * @var \DateTime
+     */
+    #[ORM\Column(name: 'dateCreation', type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private $datecreation = 'CURRENT_TIMESTAMP';
 
-    #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'projets')]
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'nomProjet', type: 'string', length: 30, nullable: false)]
+    private $nomprojet;
+
+    /**
+     * @var \Terrain
+     */
+    #[ORM\JoinColumn(name: 'Id_terrain', referencedColumnName: 'Id_terrain')]
+    #[ORM\ManyToOne(targetEntity: \Terrain::class)]
+    private $idTerrain;
+
+    /**
+     * @var \Equipe
+     */
     #[ORM\JoinColumn(name: 'Id_equipe', referencedColumnName: 'id')]
-    private ?Equipe $equipe = null;
+    #[ORM\ManyToOne(targetEntity: \Equipe::class)]
+    private $idEquipe;
 
-    public function getEquipe(): ?Equipe
+    /**
+     * @var \Client
+     */
+    #[ORM\JoinColumn(name: 'id_client', referencedColumnName: 'client_id')]
+    #[ORM\ManyToOne(targetEntity: \Client::class)]
+    private $idClient;
+
+    public function getIdProjet(): ?int
     {
-        return $this->equipe;
+        return $this->idProjet;
     }
-
-    public function setEquipe(?Equipe $equipe): self
-    {
-        $this->equipe = $equipe;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $type = null;
 
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(string $type): static
     {
         $this->type = $type;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $styleArch = null;
-
-    public function getStyleArch(): ?string
+    public function getStylearch(): ?string
     {
-        return $this->styleArch;
+        return $this->stylearch;
     }
 
-    public function setStyleArch(?string $styleArch): self
+    public function setStylearch(?string $stylearch): static
     {
-        $this->styleArch = $styleArch;
+        $this->stylearch = $stylearch;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $budget = null;
-
-    public function getBudget(): ?float
+    public function getBudget(): ?string
     {
         return $this->budget;
     }
 
-    public function setBudget(float $budget): self
+    public function setBudget(string $budget): static
     {
         $this->budget = $budget;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $etat = null;
 
     public function getEtat(): ?string
     {
         return $this->etat;
     }
 
-    public function setEtat(?string $etat): self
+    public function setEtat(?string $etat): static
     {
         $this->etat = $etat;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $dateCreation = null;
-
-    public function getDateCreation(): ?\DateTimeInterface
+    public function getDatecreation(): ?\DateTimeInterface
     {
-        return $this->dateCreation;
+        return $this->datecreation;
     }
 
-    public function setDateCreation(\DateTimeInterface $dateCreation): self
+    public function setDatecreation(\DateTimeInterface $datecreation): static
     {
-        $this->dateCreation = $dateCreation;
+        $this->datecreation = $datecreation;
+
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'projets')]
-    #[ORM\JoinColumn(name: 'id_client', referencedColumnName: 'client_id')]
-    private ?Client $client = null;
-
-    public function getClient(): ?Client
+    public function getNomprojet(): ?string
     {
-        return $this->client;
+        return $this->nomprojet;
     }
 
-    public function setClient(?Client $client): self
+    public function setNomprojet(string $nomprojet): static
     {
-        $this->client = $client;
+        $this->nomprojet = $nomprojet;
+
         return $this;
     }
 
-
-
-    #[ORM\ManyToOne(targetEntity: Terrain::class, inversedBy: 'projets')]
-    #[ORM\JoinColumn(name: 'Id_terrain', referencedColumnName: 'Id_terrain')]
-    private ?Terrain $terrain = null;
-
-    public function getTerrain(): ?Terrain
+    public function getIdTerrain(): ?Terrain
     {
-        return $this->terrain;
+        return $this->idTerrain;
     }
 
-    public function setTerrain(?Terrain $terrain): self
+    public function setIdTerrain(?Terrain $idTerrain): static
     {
-        $this->terrain = $terrain;
+        $this->idTerrain = $idTerrain;
+
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'projets')]
-    #[ORM\JoinColumn(name: 'id_utilisateur', referencedColumnName: 'id')]
-    private ?Utilisateur $utilisateur = null;
-
-    public function getUtilisateur(): ?Utilisateur
+    public function getIdEquipe(): ?Equipe
     {
-        return $this->utilisateur;
+        return $this->idEquipe;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): self
+    public function setIdEquipe(?Equipe $idEquipe): static
     {
-        $this->utilisateur = $utilisateur;
+        $this->idEquipe = $idEquipe;
+
         return $this;
     }
 
-    #[ORM\OneToMany(targetEntity: Contrat::class, mappedBy: 'projet')]
-    private Collection $contrats;
-
-    /**
-     * @return Collection<int, Contrat>
-     */
-    public function getContrats(): Collection
+    public function getIdClient(): ?Client
     {
-        if (!$this->contrats instanceof Collection) {
-            $this->contrats = new ArrayCollection();
-        }
-        return $this->contrats;
+        return $this->idClient;
     }
 
-    public function addContrat(Contrat $contrat): self
+    public function setIdClient(?Client $idClient): static
     {
-        if (!$this->getContrats()->contains($contrat)) {
-            $this->getContrats()->add($contrat);
-        }
+        $this->idClient = $idClient;
+
         return $this;
     }
 
-    public function removeContrat(Contrat $contrat): self
-    {
-        $this->getContrats()->removeElement($contrat);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Etapeprojet::class, mappedBy: 'projet')]
-    private Collection $etapeprojets;
-
-    public function __construct()
-    {
-        $this->contrats = new ArrayCollection();
-        $this->etapeprojets = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Etapeprojet>
-     */
-    public function getEtapeprojets(): Collection
-    {
-        if (!$this->etapeprojets instanceof Collection) {
-            $this->etapeprojets = new ArrayCollection();
-        }
-        return $this->etapeprojets;
-    }
-
-    public function addEtapeprojet(Etapeprojet $etapeprojet): self
-    {
-        if (!$this->getEtapeprojets()->contains($etapeprojet)) {
-            $this->getEtapeprojets()->add($etapeprojet);
-        }
-        return $this;
-    }
-
-    public function removeEtapeprojet(Etapeprojet $etapeprojet): self
-    {
-        $this->getEtapeprojets()->removeElement($etapeprojet);
-        return $this;
-    }
 
 }

@@ -4,147 +4,136 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\TerrainRepository;
-
-#[ORM\Entity(repositoryClass: TerrainRepository::class)]
+/**
+ * Terrain
+ */
 #[ORM\Table(name: 'terrain')]
+#[ORM\Index(name: 'Id_projet', columns: ['Id_projet'])]
+#[ORM\Index(name: 'Id_visite', columns: ['Id_visite'])]
+#[ORM\Entity]
 class Terrain
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'Id_terrain', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $Id_terrain = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idTerrain;
 
-    
-    public function getId_Terrain(): ?int
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'emplacement', type: 'string', length: 100, nullable: false)]
+    private $emplacement;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'caracteristiques', type: 'text', length: 65535, nullable: false)]
+    private $caracteristiques;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'superficie', type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private $superficie;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'detailsGeo', type: 'string', length: 100, nullable: true)]
+    private $detailsgeo;
+
+    /**
+     * @var \Projet
+     */
+    #[ORM\JoinColumn(name: 'Id_projet', referencedColumnName: 'Id_projet')]
+    #[ORM\ManyToOne(targetEntity: \Projet::class)]
+    private $idProjet;
+
+    /**
+     * @var \Visite
+     */
+    #[ORM\JoinColumn(name: 'Id_visite', referencedColumnName: 'Id_visite')]
+    #[ORM\ManyToOne(targetEntity: \Visite::class)]
+    private $idVisite;
+
+    public function getIdTerrain(): ?int
     {
-        return $this->Id_terrain;
+        return $this->idTerrain;
     }
-
-    public function setId_terrain(int $Id_terrain): self
-    {
-        $this->Id_terrain = $Id_terrain;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $emplacement = null;
 
     public function getEmplacement(): ?string
     {
         return $this->emplacement;
     }
 
-    public function setEmplacement(string $emplacement): self
+    public function setEmplacement(string $emplacement): static
     {
         $this->emplacement = $emplacement;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $caracteristiques = null;
 
     public function getCaracteristiques(): ?string
     {
         return $this->caracteristiques;
     }
 
-    public function setCaracteristiques(string $caracteristiques): self
+    public function setCaracteristiques(string $caracteristiques): static
     {
         $this->caracteristiques = $caracteristiques;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $superficie = null;
-
-    public function getSuperficie(): ?float
+    public function getSuperficie(): ?string
     {
         return $this->superficie;
     }
 
-    public function setSuperficie(?float $superficie): self
+    public function setSuperficie(?string $superficie): static
     {
         $this->superficie = $superficie;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $detailsGeo = null;
-
-    public function getDetailsGeo(): ?string
+    public function getDetailsgeo(): ?string
     {
-        return $this->detailsGeo;
+        return $this->detailsgeo;
     }
 
-    public function setDetailsGeo(?string $detailsGeo): self
+    public function setDetailsgeo(?string $detailsgeo): static
     {
-        $this->detailsGeo = $detailsGeo;
+        $this->detailsgeo = $detailsgeo;
+
         return $this;
     }
 
-    #[ORM\OneToMany(targetEntity: Projet::class, mappedBy: 'terrain')]
-    private Collection $projets;
-
-    /**
-     * @return Collection<int, Projet>
-     */
-    public function getProjets(): Collection
+    public function getIdProjet(): ?Projet
     {
-        if (!$this->projets instanceof Collection) {
-            $this->projets = new ArrayCollection();
-        }
-        return $this->projets;
+        return $this->idProjet;
     }
 
-    public function addProjet(Projet $projet): self
+    public function setIdProjet(?Projet $idProjet): static
     {
-        if (!$this->getProjets()->contains($projet)) {
-            $this->getProjets()->add($projet);
-        }
+        $this->idProjet = $idProjet;
+
         return $this;
     }
 
-    public function removeProjet(Projet $projet): self
+    public function getIdVisite(): ?Visite
     {
-        $this->getProjets()->removeElement($projet);
-        return $this;
+        return $this->idVisite;
     }
 
-    #[ORM\OneToMany(targetEntity: Visite::class, mappedBy: 'terrain')]
-    private Collection $visites;
-
-    public function __construct()
+    public function setIdVisite(?Visite $idVisite): static
     {
-        $this->projets = new ArrayCollection();
-        $this->visites = new ArrayCollection();
-    }
+        $this->idVisite = $idVisite;
 
-    /**
-     * @return Collection<int, Visite>
-     */
-    public function getVisites(): Collection
-    {
-        if (!$this->visites instanceof Collection) {
-            $this->visites = new ArrayCollection();
-        }
-        return $this->visites;
-    }
-
-    public function addVisite(Visite $visite): self
-    {
-        if (!$this->getVisites()->contains($visite)) {
-            $this->getVisites()->add($visite);
-        }
-        return $this;
-    }
-
-    public function removeVisite(Visite $visite): self
-    {
-        $this->getVisites()->removeElement($visite);
         return $this;
     }
 

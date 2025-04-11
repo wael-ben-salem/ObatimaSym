@@ -3,60 +3,34 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\ClientRepository;
-
-#[ORM\Entity(repositoryClass: ClientRepository::class)]
+/**
+ * Client
+ */
 #[ORM\Table(name: 'client')]
+#[ORM\Entity]
 class Client
 {
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'clients')]
-    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id')]
-    private ?Utilisateur $utilisateur = null;
-
-    public function getUtilisateur(): ?Utilisateur
-    {
-        return $this->utilisateur;
-    }
-
-    public function setUtilisateur(?Utilisateur $utilisateur): self
-    {
-        $this->utilisateur = $utilisateur;
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Projet::class, mappedBy: 'client')]
-    private Collection $projets;
-
-    public function __construct()
-    {
-        $this->projets = new ArrayCollection();
-    }
-
     /**
-     * @return Collection<int, Projet>
+     * @var \Utilisateur
      */
-    public function getProjets(): Collection
+    #[ORM\JoinColumn(name: 'client_id', referencedColumnName: 'id')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\OneToOne(targetEntity: \Utilisateur::class)]
+    private $client;
+
+    public function getClient(): ?Utilisateur
     {
-        if (!$this->projets instanceof Collection) {
-            $this->projets = new ArrayCollection();
-        }
-        return $this->projets;
+        return $this->client;
     }
 
-    public function addProjet(Projet $projet): self
+    public function setClient(?Utilisateur $client): static
     {
-        if (!$this->getProjets()->contains($projet)) {
-            $this->getProjets()->add($projet);
-        }
+        $this->client = $client;
+
         return $this;
     }
 
-    public function removeProjet(Projet $projet): self
-    {
-        $this->getProjets()->removeElement($projet);
-        return $this;
-    }
+
 }

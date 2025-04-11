@@ -2,110 +2,112 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
-use App\Repository\ArtisanRepository;
-
-#[ORM\Entity(repositoryClass: ArtisanRepository::class)]
+/**
+ * Artisan
+ */
 #[ORM\Table(name: 'artisan')]
+#[ORM\Entity]
 class Artisan
 {
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'artisans')]
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'specialite', type: 'string', length: 0, nullable: false)]
+    private $specialite;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'salaire_heure', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private $salaireHeure;
+
+    /**
+     * @var \Utilisateur
+     */
     #[ORM\JoinColumn(name: 'artisan_id', referencedColumnName: 'id')]
-    private ?Utilisateur $utilisateur = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\OneToOne(targetEntity: \Utilisateur::class)]
+    private $artisan;
 
-    public function getUtilisateur(): ?Utilisateur
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    #[ORM\ManyToMany(targetEntity: \Equipe::class, mappedBy: 'artisan')]
+    private $equipe = array();
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        return $this->utilisateur;
+        $this->equipe = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
-    public function setUtilisateur(?Utilisateur $utilisateur): self
-    {
-        $this->utilisateur = $utilisateur;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $specialite = null;
 
     public function getSpecialite(): ?string
     {
         return $this->specialite;
     }
 
-    public function setSpecialite(string $specialite): self
+    public function setSpecialite(string $specialite): static
     {
         $this->specialite = $specialite;
-        return $this;
-    }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $salaire_heure = null;
-
-    public function getSalaire_heure(): ?float
-    {
-        return $this->salaire_heure;
-    }
-
-    public function setSalaire_heure(float $salaire_heure): self
-    {
-        $this->salaire_heure = $salaire_heure;
-        return $this;
-    }
-
-    #[ORM\ManyToMany(targetEntity: Equipe::class, inversedBy: 'artisans')]
-    #[ORM\JoinTable(
-        name: 'equipe_artisan',
-        joinColumns: [
-            new ORM\JoinColumn(name: 'artisan_id', referencedColumnName: 'artisan_id')
-        ],
-        inverseJoinColumns: [
-            new ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'id')
-        ]
-    )]
-    private Collection $equipes;
-
-    public function __construct()
-    {
-        $this->equipes = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Equipe>
-     */
-    public function getEquipes(): Collection
-    {
-        if (!$this->equipes instanceof Collection) {
-            $this->equipes = new ArrayCollection();
-        }
-        return $this->equipes;
-    }
-
-    public function addEquipe(Equipe $equipe): self
-    {
-        if (!$this->getEquipes()->contains($equipe)) {
-            $this->getEquipes()->add($equipe);
-        }
-        return $this;
-    }
-
-    public function removeEquipe(Equipe $equipe): self
-    {
-        $this->getEquipes()->removeElement($equipe);
         return $this;
     }
 
     public function getSalaireHeure(): ?string
     {
-        return $this->salaire_heure;
+        return $this->salaireHeure;
     }
 
-    public function setSalaireHeure(string $salaire_heure): static
+    public function setSalaireHeure(string $salaireHeure): static
     {
-        $this->salaire_heure = $salaire_heure;
+        $this->salaireHeure = $salaireHeure;
+
+        return $this;
+    }
+
+    public function getArtisan(): ?Utilisateur
+    {
+        return $this->artisan;
+    }
+
+    public function setArtisan(?Utilisateur $artisan): static
+    {
+        $this->artisan = $artisan;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipe>
+     */
+    public function getEquipe(): Collection
+    {
+        return $this->equipe;
+    }
+
+    public function addEquipe(Equipe $equipe): static
+    {
+        if (!$this->equipe->contains($equipe)) {
+            $this->equipe->add($equipe);
+            $equipe->addArtisan($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEquipe(Equipe $equipe): static
+    {
+        if ($this->equipe->removeElement($equipe)) {
+            $equipe->removeArtisan($this);
+        }
 
         return $this;
     }

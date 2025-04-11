@@ -4,119 +4,100 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\RapportRepository;
-
-#[ORM\Entity(repositoryClass: RapportRepository::class)]
+/**
+ * Rapport
+ */
 #[ORM\Table(name: 'rapport')]
+#[ORM\Index(name: 'Id_etapeProjet', columns: ['Id_etapeProjet'])]
+#[ORM\Entity]
 class Rapport
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $id;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'titre', type: 'string', length: 100, nullable: false)]
+    private $titre;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'contenu', type: 'text', length: 65535, nullable: false)]
+    private $contenu;
+
+    /**
+     * @var \DateTime
+     */
+    #[ORM\Column(name: 'dateCreation', type: 'date', nullable: false)]
+    private $datecreation;
+
+    /**
+     * @var \Etapeprojet
+     */
+    #[ORM\JoinColumn(name: 'Id_etapeProjet', referencedColumnName: 'Id_etapeProjet')]
+    #[ORM\ManyToOne(targetEntity: \Etapeprojet::class)]
+    private $idEtapeprojet;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    #[ORM\ManyToOne(targetEntity: Etapeprojet::class, inversedBy: 'rapports')]
-    #[ORM\JoinColumn(name: 'Id_etapeProjet', referencedColumnName: 'Id_etapeProjet')]
-    private ?Etapeprojet $etapeprojet = null;
-
-    public function getEtapeprojet(): ?Etapeprojet
-    {
-        return $this->etapeprojet;
-    }
-
-    public function setEtapeprojet(?Etapeprojet $etapeprojet): self
-    {
-        $this->etapeprojet = $etapeprojet;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $titre = null;
-
     public function getTitre(): ?string
     {
         return $this->titre;
     }
 
-    public function setTitre(string $titre): self
+    public function setTitre(string $titre): static
     {
         $this->titre = $titre;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $contenu = null;
 
     public function getContenu(): ?string
     {
         return $this->contenu;
     }
 
-    public function setContenu(string $contenu): self
+    public function setContenu(string $contenu): static
     {
         $this->contenu = $contenu;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'date', nullable: false)]
-    private ?\DateTimeInterface $dateCreation = null;
-
-    public function getDateCreation(): ?\DateTimeInterface
+    public function getDatecreation(): ?\DateTimeInterface
     {
-        return $this->dateCreation;
+        return $this->datecreation;
     }
 
-    public function setDateCreation(\DateTimeInterface $dateCreation): self
+    public function setDatecreation(\DateTimeInterface $datecreation): static
     {
-        $this->dateCreation = $dateCreation;
+        $this->datecreation = $datecreation;
+
         return $this;
     }
 
-    #[ORM\OneToMany(targetEntity: Etapeprojet::class, mappedBy: 'rapport')]
-    private Collection $etapeprojets;
-
-    public function __construct()
+    public function getIdEtapeprojet(): ?Etapeprojet
     {
-        $this->etapeprojets = new ArrayCollection();
+        return $this->idEtapeprojet;
     }
 
-    /**
-     * @return Collection<int, Etapeprojet>
-     */
-    public function getEtapeprojets(): Collection
+    public function setIdEtapeprojet(?Etapeprojet $idEtapeprojet): static
     {
-        if (!$this->etapeprojets instanceof Collection) {
-            $this->etapeprojets = new ArrayCollection();
-        }
-        return $this->etapeprojets;
-    }
+        $this->idEtapeprojet = $idEtapeprojet;
 
-    public function addEtapeprojet(Etapeprojet $etapeprojet): self
-    {
-        if (!$this->getEtapeprojets()->contains($etapeprojet)) {
-            $this->getEtapeprojets()->add($etapeprojet);
-        }
         return $this;
     }
 
-    public function removeEtapeprojet(Etapeprojet $etapeprojet): self
-    {
-        $this->getEtapeprojets()->removeElement($etapeprojet);
-        return $this;
-    }
 
 }

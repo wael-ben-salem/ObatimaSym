@@ -4,197 +4,158 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\TacheRepository;
-
-#[ORM\Entity(repositoryClass: TacheRepository::class)]
+/**
+ * Tache
+ */
 #[ORM\Table(name: 'tache')]
+#[ORM\Index(name: 'constructeur_id', columns: ['constructeur_id'])]
+#[ORM\Index(name: 'artisan_id', columns: ['artisan_id'])]
+#[ORM\Index(name: 'Id_projet', columns: ['Id_projet'])]
+#[ORM\Entity]
 class Tache
 {
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_tache = null;
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id_tache', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idTache;
 
-    public function getId_tache(): ?int
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
+    private $description;
+
+    /**
+     * @var \DateTime
+     */
+    #[ORM\Column(name: 'date_debut', type: 'date', nullable: false)]
+    private $dateDebut;
+
+    /**
+     * @var \DateTime|null
+     */
+    #[ORM\Column(name: 'date_fin', type: 'date', nullable: true)]
+    private $dateFin;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'etat', type: 'string', length: 0, nullable: true)]
+    private $etat;
+
+    /**
+     * @var \Constructeur
+     */
+    #[ORM\JoinColumn(name: 'constructeur_id', referencedColumnName: 'constructeur_id')]
+    #[ORM\ManyToOne(targetEntity: \Constructeur::class)]
+    private $constructeur;
+
+    /**
+     * @var \Artisan
+     */
+    #[ORM\JoinColumn(name: 'artisan_id', referencedColumnName: 'artisan_id')]
+    #[ORM\ManyToOne(targetEntity: \Artisan::class)]
+    private $artisan;
+
+    /**
+     * @var \Projet
+     */
+    #[ORM\JoinColumn(name: 'Id_projet', referencedColumnName: 'Id_projet')]
+    #[ORM\ManyToOne(targetEntity: \Projet::class)]
+    private $idProjet;
+
+    public function getIdTache(): ?int
     {
-        return $this->id_tache;
+        return $this->idTache;
     }
-
-    public function setId_tache(int $id_tache): self
-    {
-        $this->id_tache = $id_tache;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $Id_projet = null;
-
-    public function getId_projet(): ?int
-    {
-        return $this->Id_projet;
-    }
-
-    public function setId_projet(?int $Id_projet): self
-    {
-        $this->Id_projet = $Id_projet;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $constructeur_id = null;
-
-    public function getConstructeur_id(): ?int
-    {
-        return $this->constructeur_id;
-    }
-
-    public function setConstructeur_id(?int $constructeur_id): self
-    {
-        $this->constructeur_id = $constructeur_id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $artisan_id = null;
-
-    public function getArtisan_id(): ?int
-    {
-        return $this->artisan_id;
-    }
-
-    public function setArtisan_id(?int $artisan_id): self
-    {
-        $this->artisan_id = $artisan_id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $description = null;
 
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(string $description): static
     {
         $this->description = $description;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'date', nullable: false)]
-    private ?\DateTimeInterface $date_debut = null;
-
-    public function getDate_debut(): ?\DateTimeInterface
-    {
-        return $this->date_debut;
-    }
-
-    public function setDate_debut(\DateTimeInterface $date_debut): self
-    {
-        $this->date_debut = $date_debut;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $date_fin = null;
-
-    public function getDate_fin(): ?\DateTimeInterface
-    {
-        return $this->date_fin;
-    }
-
-    public function setDate_fin(?\DateTimeInterface $date_fin): self
-    {
-        $this->date_fin = $date_fin;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $etat = null;
-
-    public function getEtat(): ?string
-    {
-        return $this->etat;
-    }
-
-    public function setEtat(?string $etat): self
-    {
-        $this->etat = $etat;
-        return $this;
-    }
-
-    public function getIdTache(): ?int
-    {
-        return $this->id_tache;
-    }
-
-    public function setIdTache(int $id_tache): static
-    {
-        $this->id_tache = $id_tache;
-
-        return $this;
-    }
-
-    public function getIdProjet(): ?int
-    {
-        return $this->Id_projet;
-    }
-
-    public function setIdProjet(?int $Id_projet): static
-    {
-        $this->Id_projet = $Id_projet;
-
-        return $this;
-    }
-
-    public function getConstructeurId(): ?int
-    {
-        return $this->constructeur_id;
-    }
-
-    public function setConstructeurId(?int $constructeur_id): static
-    {
-        $this->constructeur_id = $constructeur_id;
-
-        return $this;
-    }
-
-    public function getArtisanId(): ?int
-    {
-        return $this->artisan_id;
-    }
-
-    public function setArtisanId(?int $artisan_id): static
-    {
-        $this->artisan_id = $artisan_id;
 
         return $this;
     }
 
     public function getDateDebut(): ?\DateTimeInterface
     {
-        return $this->date_debut;
+        return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $date_debut): static
+    public function setDateDebut(\DateTimeInterface $dateDebut): static
     {
-        $this->date_debut = $date_debut;
+        $this->dateDebut = $dateDebut;
 
         return $this;
     }
 
     public function getDateFin(): ?\DateTimeInterface
     {
-        return $this->date_fin;
+        return $this->dateFin;
     }
 
-    public function setDateFin(?\DateTimeInterface $date_fin): static
+    public function setDateFin(?\DateTimeInterface $dateFin): static
     {
-        $this->date_fin = $date_fin;
+        $this->dateFin = $dateFin;
 
         return $this;
     }
+
+    public function getEtat(): ?string
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?string $etat): static
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getConstructeur(): ?Constructeur
+    {
+        return $this->constructeur;
+    }
+
+    public function setConstructeur(?Constructeur $constructeur): static
+    {
+        $this->constructeur = $constructeur;
+
+        return $this;
+    }
+
+    public function getArtisan(): ?Artisan
+    {
+        return $this->artisan;
+    }
+
+    public function setArtisan(?Artisan $artisan): static
+    {
+        $this->artisan = $artisan;
+
+        return $this;
+    }
+
+    public function getIdProjet(): ?Projet
+    {
+        return $this->idProjet;
+    }
+
+    public function setIdProjet(?Projet $idProjet): static
+    {
+        $this->idProjet = $idProjet;
+
+        return $this;
+    }
+
 
 }

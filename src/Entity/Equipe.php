@@ -2,171 +2,165 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
-use App\Repository\EquipeRepository;
-
-#[ORM\Entity(repositoryClass: EquipeRepository::class)]
+/**
+ * Equipe
+ */
 #[ORM\Table(name: 'equipe')]
+#[ORM\Index(name: 'idx_constructeur', columns: ['constructeur_id'])]
+#[ORM\Index(name: 'idx_gestionnaire', columns: ['gestionnairestock_id'])]
+#[ORM\UniqueConstraint(name: 'nom', columns: ['nom'])]
+#[ORM\Entity]
 class Equipe
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $id;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'nom', type: 'string', length: 100, nullable: false)]
+    private $nom;
+
+    /**
+     * @var \DateTime
+     */
+    #[ORM\Column(name: 'date_creation', type: 'date', nullable: false, options: ['default' => 'CURRENT_DATE'])]
+    private $dateCreation = 'CURRENT_DATE';
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'rating', type: 'decimal', precision: 3, scale: 2, nullable: true, options: ['default' => '0.00'])]
+    private $rating = '0.00';
+
+    /**
+     * @var \Constructeur
+     */
+    #[ORM\JoinColumn(name: 'constructeur_id', referencedColumnName: 'constructeur_id')]
+    #[ORM\ManyToOne(targetEntity: \Constructeur::class)]
+    private $constructeur;
+
+    /**
+     * @var \Gestionnairestock
+     */
+    #[ORM\JoinColumn(name: 'gestionnairestock_id', referencedColumnName: 'gestionnairestock_id')]
+    #[ORM\ManyToOne(targetEntity: \Gestionnairestock::class)]
+    private $gestionnairestock;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    #[ORM\JoinTable(name: 'equipe_artisan')]
+    #[ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'artisan_id', referencedColumnName: 'artisan_id')]
+    #[ORM\ManyToMany(targetEntity: \Artisan::class, inversedBy: 'equipe')]
+    private $artisan = array();
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->artisan = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
     public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
 
-    #[ORM\OneToOne(targetEntity: Constructeur::class, inversedBy: 'equipe')]
-    #[ORM\JoinColumn(name: 'constructeur_id', referencedColumnName: 'constructeur_id', unique: true)]
-    private ?Constructeur $constructeur = null;
+    public function getDateCreation(): ?\DateTimeInterface
+    {
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTimeInterface $dateCreation): static
+    {
+        $this->dateCreation = $dateCreation;
+
+        return $this;
+    }
+
+    public function getRating(): ?string
+    {
+        return $this->rating;
+    }
+
+    public function setRating(?string $rating): static
+    {
+        $this->rating = $rating;
+
+        return $this;
+    }
 
     public function getConstructeur(): ?Constructeur
     {
         return $this->constructeur;
     }
 
-    public function setConstructeur(?Constructeur $constructeur): self
+    public function setConstructeur(?Constructeur $constructeur): static
     {
         $this->constructeur = $constructeur;
+
         return $this;
     }
-
-    #[ORM\OneToOne(targetEntity: Gestionnairestock::class, inversedBy: 'equipe')]
-    #[ORM\JoinColumn(name: 'gestionnaire_stock_id', referencedColumnName: 'gestionnairestock_id', unique: true)]
-    private ?Gestionnairestock $gestionnairestock = null;
 
     public function getGestionnairestock(): ?Gestionnairestock
     {
         return $this->gestionnairestock;
     }
 
-    public function setGestionnairestock(?Gestionnairestock $gestionnairestock): self
+    public function setGestionnairestock(?Gestionnairestock $gestionnairestock): static
     {
         $this->gestionnairestock = $gestionnairestock;
+
         return $this;
-    }
-
-    #[ORM\Column(type: 'date', nullable: false)]
-    private ?\DateTimeInterface $date_creation = null;
-
-    public function getDate_creation(): ?\DateTimeInterface
-    {
-        return $this->date_creation;
-    }
-
-    public function setDate_creation(\DateTimeInterface $date_creation): self
-    {
-        $this->date_creation = $date_creation;
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Projet::class, mappedBy: 'equipe')]
-    private Collection $projets;
-
-    /**
-     * @return Collection<int, Projet>
-     */
-    public function getProjets(): Collection
-    {
-        if (!$this->projets instanceof Collection) {
-            $this->projets = new ArrayCollection();
-        }
-        return $this->projets;
-    }
-
-    public function addProjet(Projet $projet): self
-    {
-        if (!$this->getProjets()->contains($projet)) {
-            $this->getProjets()->add($projet);
-        }
-        return $this;
-    }
-
-    public function removeProjet(Projet $projet): self
-    {
-        $this->getProjets()->removeElement($projet);
-        return $this;
-    }
-
-    #[ORM\ManyToMany(targetEntity: Artisan::class, inversedBy: 'equipes')]
-    #[ORM\JoinTable(
-        name: 'equipe_artisan',
-        joinColumns: [
-            new ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'id')
-        ],
-        inverseJoinColumns: [
-            new ORM\JoinColumn(name: 'artisan_id', referencedColumnName: 'artisan_id')
-        ]
-    )]
-    private Collection $artisans;
-
-    public function __construct()
-    {
-        $this->projets = new ArrayCollection();
-        $this->artisans = new ArrayCollection();
     }
 
     /**
      * @return Collection<int, Artisan>
      */
-    public function getArtisans(): Collection
+    public function getArtisan(): Collection
     {
-        if (!$this->artisans instanceof Collection) {
-            $this->artisans = new ArrayCollection();
+        return $this->artisan;
+    }
+
+    public function addArtisan(Artisan $artisan): static
+    {
+        if (!$this->artisan->contains($artisan)) {
+            $this->artisan->add($artisan);
         }
-        return $this->artisans;
-    }
-
-    public function addArtisan(Artisan $artisan): self
-    {
-        if (!$this->getArtisans()->contains($artisan)) {
-            $this->getArtisans()->add($artisan);
-        }
-        return $this;
-    }
-
-    public function removeArtisan(Artisan $artisan): self
-    {
-        $this->getArtisans()->removeElement($artisan);
-        return $this;
-    }
-
-    public function getDateCreation(): ?\DateTimeInterface
-    {
-        return $this->date_creation;
-    }
-
-    public function setDateCreation(\DateTimeInterface $date_creation): static
-    {
-        $this->date_creation = $date_creation;
 
         return $this;
     }
+
+    public function removeArtisan(Artisan $artisan): static
+    {
+        $this->artisan->removeElement($artisan);
+
+        return $this;
+    }
+
 }

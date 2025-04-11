@@ -2,378 +2,310 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Doctrine\ORM\Mapping as ORM;
 
-use App\Repository\UtilisateurRepository;
-
-#[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+/**
+ * Utilisateur
+ */
 #[ORM\Table(name: 'utilisateur')]
-class Utilisateur
+#[ORM\Index(name: 'idx_role', columns: ['role'])]
+#[ORM\UniqueConstraint(name: 'email', columns: ['email'])]
+#[ORM\Entity]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $id;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'nom', type: 'string', length: 50, nullable: false)]
+    private $nom;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'prenom', type: 'string', length: 50, nullable: false)]
+    private $prenom;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'email', type: 'string', length: 100, nullable: false)]
+    private $email;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'telephone', type: 'string', length: 20, nullable: true)]
+    private $telephone;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'role', type: 'string', length: 0, nullable: true, options: ['default' => 'Client'])]
+    private $role = 'Client';
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'adresse', type: 'text', length: 65535, nullable: true)]
+    private $adresse;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'mot_de_passe', type: 'string', length: 255, nullable: false)]
+    private $password;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'statut', type: 'string', length: 0, nullable: true, options: ['default' => 'en_attente'])]
+    private $statut = 'en_attente';
+
+    /**
+     * @var bool|null
+     */
+    #[ORM\Column(name: 'isConfirmed', type: 'boolean', nullable: true)]
+    private $isconfirmed = '0';
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'face_data', type: 'blob', length: 0, nullable: true)]
+    private $faceData;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'reset_token', type: 'string', length: 255, nullable: true)]
+    private $resetToken;
+
+    /**
+     * @var \DateTime|null
+     */
+    #[ORM\Column(name: 'reset_token_expiry', type: 'datetime', nullable: true)]
+    private $resetTokenExpiry;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    #[ORM\ManyToMany(targetEntity: \Conversation::class, mappedBy: 'utilisateur')]
+    private $conversation = array();
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->conversation = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
     public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $prenom = null;
 
     public function getPrenom(): ?string
     {
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $email = null;
 
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(string $email): static
     {
         $this->email = $email;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $telephone = null;
 
     public function getTelephone(): ?string
     {
         return $this->telephone;
     }
 
-    public function setTelephone(?string $telephone): self
+    public function setTelephone(?string $telephone): static
     {
         $this->telephone = $telephone;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $role = null;
 
     public function getRole(): ?string
     {
         return $this->role;
     }
 
-    public function setRole(?string $role): self
+    public function setRole(?string $role): static
     {
         $this->role = $role;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $adresse = null;
 
     public function getAdresse(): ?string
     {
         return $this->adresse;
     }
 
-    public function setAdresse(?string $adresse): self
+    public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $mot_de_passe = null;
-
-    public function getMot_de_passe(): ?string
+    public function getMotDePasse(): ?string
     {
-        return $this->mot_de_passe;
+        return $this->password;
     }
 
-    public function setMot_de_passe(string $mot_de_passe): self
+    public function setMotDePasse(string $password): static
     {
-        $this->mot_de_passe = $mot_de_passe;
+        $this->password = $password;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $statut = null;
 
     public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut(?string $statut): self
+    public function setStatut(?string $statut): static
     {
         $this->statut = $statut;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $isConfirmed = null;
-
-    public function isIsConfirmed(): ?bool
-    {
-        return $this->isConfirmed;
-    }
-
-    public function setIsConfirmed(?bool $isConfirmed): self
-    {
-        $this->isConfirmed = $isConfirmed;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'blob', nullable: true)]
-    private ?string $face_data = null;
-
-    public function getFace_data(): ?string
-    {
-        return $this->face_data;
-    }
-
-    public function setFace_data(?string $face_data): self
-    {
-        $this->face_data = $face_data;
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Admin::class, mappedBy: 'utilisateur')]
-    private Collection $admins;
-
-    /**
-     * @return Collection<int, Admin>
-     */
-    public function getAdmins(): Collection
-    {
-        if (!$this->admins instanceof Collection) {
-            $this->admins = new ArrayCollection();
-        }
-        return $this->admins;
-    }
-
-    public function addAdmin(Admin $admin): self
-    {
-        if (!$this->getAdmins()->contains($admin)) {
-            $this->getAdmins()->add($admin);
-        }
-        return $this;
-    }
-
-    public function removeAdmin(Admin $admin): self
-    {
-        $this->getAdmins()->removeElement($admin);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Artisan::class, mappedBy: 'utilisateur')]
-    private Collection $artisans;
-
-    /**
-     * @return Collection<int, Artisan>
-     */
-    public function getArtisans(): Collection
-    {
-        if (!$this->artisans instanceof Collection) {
-            $this->artisans = new ArrayCollection();
-        }
-        return $this->artisans;
-    }
-
-    public function addArtisan(Artisan $artisan): self
-    {
-        if (!$this->getArtisans()->contains($artisan)) {
-            $this->getArtisans()->add($artisan);
-        }
-        return $this;
-    }
-
-    public function removeArtisan(Artisan $artisan): self
-    {
-        $this->getArtisans()->removeElement($artisan);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Client::class, mappedBy: 'utilisateur')]
-    private Collection $clients;
-
-    /**
-     * @return Collection<int, Client>
-     */
-    public function getClients(): Collection
-    {
-        if (!$this->clients instanceof Collection) {
-            $this->clients = new ArrayCollection();
-        }
-        return $this->clients;
-    }
-
-    public function addClient(Client $client): self
-    {
-        if (!$this->getClients()->contains($client)) {
-            $this->getClients()->add($client);
-        }
-        return $this;
-    }
-
-    public function removeClient(Client $client): self
-    {
-        $this->getClients()->removeElement($client);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Constructeur::class, mappedBy: 'utilisateur')]
-    private Collection $constructeurs;
-
-    /**
-     * @return Collection<int, Constructeur>
-     */
-    public function getConstructeurs(): Collection
-    {
-        if (!$this->constructeurs instanceof Collection) {
-            $this->constructeurs = new ArrayCollection();
-        }
-        return $this->constructeurs;
-    }
-
-    public function addConstructeur(Constructeur $constructeur): self
-    {
-        if (!$this->getConstructeurs()->contains($constructeur)) {
-            $this->getConstructeurs()->add($constructeur);
-        }
-        return $this;
-    }
-
-    public function removeConstructeur(Constructeur $constructeur): self
-    {
-        $this->getConstructeurs()->removeElement($constructeur);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Gestionnairestock::class, mappedBy: 'utilisateur')]
-    private Collection $gestionnairestocks;
-
-    /**
-     * @return Collection<int, Gestionnairestock>
-     */
-    public function getGestionnairestocks(): Collection
-    {
-        if (!$this->gestionnairestocks instanceof Collection) {
-            $this->gestionnairestocks = new ArrayCollection();
-        }
-        return $this->gestionnairestocks;
-    }
-
-    public function addGestionnairestock(Gestionnairestock $gestionnairestock): self
-    {
-        if (!$this->getGestionnairestocks()->contains($gestionnairestock)) {
-            $this->getGestionnairestocks()->add($gestionnairestock);
-        }
-        return $this;
-    }
-
-    public function removeGestionnairestock(Gestionnairestock $gestionnairestock): self
-    {
-        $this->getGestionnairestocks()->removeElement($gestionnairestock);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Projet::class, mappedBy: 'utilisateur')]
-    private Collection $projets;
-
-    public function __construct()
-    {
-        $this->admins = new ArrayCollection();
-        $this->artisans = new ArrayCollection();
-        $this->clients = new ArrayCollection();
-        $this->constructeurs = new ArrayCollection();
-        $this->gestionnairestocks = new ArrayCollection();
-        $this->projets = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Projet>
-     */
-    public function getProjets(): Collection
-    {
-        if (!$this->projets instanceof Collection) {
-            $this->projets = new ArrayCollection();
-        }
-        return $this->projets;
-    }
-
-    public function addProjet(Projet $projet): self
-    {
-        if (!$this->getProjets()->contains($projet)) {
-            $this->getProjets()->add($projet);
-        }
-        return $this;
-    }
-
-    public function removeProjet(Projet $projet): self
-    {
-        $this->getProjets()->removeElement($projet);
-        return $this;
-    }
-
-    public function getMotDePasse(): ?string
-    {
-        return $this->mot_de_passe;
-    }
-
-    public function setMotDePasse(string $mot_de_passe): static
-    {
-        $this->mot_de_passe = $mot_de_passe;
 
         return $this;
     }
 
-    public function isConfirmed(): ?bool
+    public function isconfirmed(): ?bool
     {
-        return $this->isConfirmed;
+        return $this->isconfirmed;
+    }
+
+    public function setIsconfirmed(?bool $isconfirmed): static
+    {
+        $this->isconfirmed = $isconfirmed;
+
+        return $this;
     }
 
     public function getFaceData()
     {
-        return $this->face_data;
+        return $this->faceData;
     }
 
-    public function setFaceData($face_data): static
+    public function setFaceData($faceData): static
     {
-        $this->face_data = $face_data;
+        $this->faceData = $faceData;
 
         return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    public function getResetTokenExpiry(): ?\DateTimeInterface
+    {
+        return $this->resetTokenExpiry;
+    }
+
+    public function setResetTokenExpiry(?\DateTimeInterface $resetTokenExpiry): static
+    {
+        $this->resetTokenExpiry = $resetTokenExpiry;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversation(): Collection
+    {
+        return $this->conversation;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversation->contains($conversation)) {
+            $this->conversation->add($conversation);
+            $conversation->addUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversation->removeElement($conversation)) {
+            $conversation->removeUtilisateur($this);
+        }
+
+        return $this;
+    }
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_' . strtoupper($this->role ?? 'CLIENT')];
+    }
+    
+
+    public function eraseCredentials(): void
+    {
+        // Si tu stockes des données sensibles temporairement, efface-les ici
     }
 
 }

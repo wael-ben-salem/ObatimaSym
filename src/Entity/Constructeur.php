@@ -4,82 +4,70 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\ConstructeurRepository;
-
-#[ORM\Entity(repositoryClass: ConstructeurRepository::class)]
+/**
+ * Constructeur
+ */
 #[ORM\Table(name: 'constructeur')]
+#[ORM\Entity]
 class Constructeur
 {
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'constructeurs')]
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'specialite', type: 'string', length: 100, nullable: false)]
+    private $specialite;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'salaire_heure', type: 'decimal', precision: 10, scale: 2, nullable: false)]
+    private $salaireHeure;
+
+    /**
+     * @var \Utilisateur
+     */
     #[ORM\JoinColumn(name: 'constructeur_id', referencedColumnName: 'id')]
-    private ?Utilisateur $utilisateur = null;
-
-    public function getUtilisateur(): ?Utilisateur
-    {
-        return $this->utilisateur;
-    }
-
-    public function setUtilisateur(?Utilisateur $utilisateur): self
-    {
-        $this->utilisateur = $utilisateur;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $specialite = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\OneToOne(targetEntity: \Utilisateur::class)]
+    private $constructeur;
 
     public function getSpecialite(): ?string
     {
         return $this->specialite;
     }
 
-    public function setSpecialite(string $specialite): self
+    public function setSpecialite(string $specialite): static
     {
         $this->specialite = $specialite;
-        return $this;
-    }
 
-    #[ORM\Column(type: 'decimal', nullable: false)]
-    private ?float $salaire_heure = null;
-
-    public function getSalaire_heure(): ?float
-    {
-        return $this->salaire_heure;
-    }
-
-    public function setSalaire_heure(float $salaire_heure): self
-    {
-        $this->salaire_heure = $salaire_heure;
-        return $this;
-    }
-
-    #[ORM\OneToOne(targetEntity: Equipe::class, mappedBy: 'constructeur')]
-    private ?Equipe $equipe = null;
-
-    public function getEquipe(): ?Equipe
-    {
-        return $this->equipe;
-    }
-
-    public function setEquipe(?Equipe $equipe): self
-    {
-        $this->equipe = $equipe;
         return $this;
     }
 
     public function getSalaireHeure(): ?string
     {
-        return $this->salaire_heure;
+        return $this->salaireHeure;
     }
 
-    public function setSalaireHeure(string $salaire_heure): static
+    public function setSalaireHeure(string $salaireHeure): static
     {
-        $this->salaire_heure = $salaire_heure;
+        $this->salaireHeure = $salaireHeure;
 
         return $this;
     }
+
+    public function getConstructeur(): ?Utilisateur
+    {
+        return $this->constructeur;
+    }
+
+    public function setConstructeur(?Utilisateur $constructeur): static
+    {
+        $this->constructeur = $constructeur;
+
+        return $this;
+    }
+
 
 }

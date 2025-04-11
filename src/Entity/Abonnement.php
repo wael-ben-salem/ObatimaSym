@@ -4,88 +4,80 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\AbonnementRepository;
-
-#[ORM\Entity(repositoryClass: AbonnementRepository::class)]
+/**
+ * Abonnement
+ */
 #[ORM\Table(name: 'abonnement')]
+#[ORM\Entity]
 class Abonnement
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'id_abonnement', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_abonnement = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idAbonnement;
 
-    public function getId_abonnement(): ?int
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'nom_abonnement', type: 'string', length: 255, nullable: true)]
+    private $nomAbonnement;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'duree', type: 'string', length: 100, nullable: true)]
+    private $duree;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'prix', type: 'decimal', precision: 10, scale: 2, nullable: true)]
+    private $prix;
+
+    public function getIdAbonnement(): ?int
     {
-        return $this->id_abonnement;
+        return $this->idAbonnement;
     }
 
-    public function setId_abonnement(int $id_abonnement): self
+    public function getNomAbonnement(): ?string
     {
-        $this->id_abonnement = $id_abonnement;
+        return $this->nomAbonnement;
+    }
+
+    public function setNomAbonnement(?string $nomAbonnement): static
+    {
+        $this->nomAbonnement = $nomAbonnement;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $nom_abonnement = null;
-
-    public function getNom_abonnement(): ?string
-    {
-        return $this->nom_abonnement;
-    }
-
-    public function setNom_abonnement(?string $nom_abonnement): self
-    {
-        $this->nom_abonnement = $nom_abonnement;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $duree = null;
 
     public function getDuree(): ?string
     {
         return $this->duree;
     }
 
-    public function setDuree(?string $duree): self
+    public function setDuree(?string $duree): static
     {
         $this->duree = $duree;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $prix = null;
-
-    public function getPrix(): ?float
+    public function getPrix(): ?string
     {
         return $this->prix;
     }
 
-    public function setPrix(?float $prix): self
+    public function setPrix(?string $prix): static
     {
         $this->prix = $prix;
-        return $this;
-    }
-
-    public function getIdAbonnement(): ?int
-    {
-        return $this->id_abonnement;
-    }
-
-    public function getNomAbonnement(): ?string
-    {
-        return $this->nom_abonnement;
-    }
-
-    public function setNomAbonnement(?string $nom_abonnement): static
-    {
-        $this->nom_abonnement = $nom_abonnement;
 
         return $this;
     }
+
 
 }

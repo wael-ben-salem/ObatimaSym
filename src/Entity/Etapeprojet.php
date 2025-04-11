@@ -4,205 +4,174 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
-use App\Repository\EtapeprojetRepository;
-
-#[ORM\Entity(repositoryClass: EtapeprojetRepository::class)]
+/**
+ * Etapeprojet
+ */
 #[ORM\Table(name: 'etapeprojet')]
+#[ORM\Index(name: 'Id_projet', columns: ['Id_projet'])]
+#[ORM\Index(name: 'Id_rapport', columns: ['Id_rapport'])]
+#[ORM\Entity]
 class Etapeprojet
 {
+    /**
+     * @var int
+     */
+    #[ORM\Column(name: 'Id_etapeProjet', type: 'integer', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $Id_etapeProjet = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private $idEtapeprojet;
 
-    public function getId_etapeProjet(): ?int
-    {
-        return $this->Id_etapeProjet;
-    }
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'nomEtape', type: 'string', length: 50, nullable: false)]
+    private $nometape;
 
-    public function setId_etapeProjet(int $Id_etapeProjet): self
-    {
-        $this->Id_etapeProjet = $Id_etapeProjet;
-        return $this;
-    }
+    /**
+     * @var string
+     */
+    #[ORM\Column(name: 'description', type: 'text', length: 65535, nullable: false)]
+    private $description;
 
-    #[ORM\ManyToOne(targetEntity: Projet::class, inversedBy: 'etapeprojets')]
+    /**
+     * @var \DateTime|null
+     */
+    #[ORM\Column(name: 'dateDebut', type: 'date', nullable: true)]
+    private $datedebut;
+
+    /**
+     * @var \DateTime|null
+     */
+    #[ORM\Column(name: 'dateFin', type: 'date', nullable: true)]
+    private $datefin;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'statut', type: 'string', length: 0, nullable: true, options: ['default' => 'En attente'])]
+    private $statut = 'En attente';
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'montant', type: 'decimal', precision: 15, scale: 3, nullable: true)]
+    private $montant;
+
+    /**
+     * @var \Projet
+     */
     #[ORM\JoinColumn(name: 'Id_projet', referencedColumnName: 'Id_projet')]
-    private ?Projet $projet = null;
+    #[ORM\ManyToOne(targetEntity: \Projet::class)]
+    private $idProjet;
 
-    public function getProjet(): ?Projet
+    /**
+     * @var \Rapport
+     */
+    #[ORM\JoinColumn(name: 'Id_rapport', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \Rapport::class)]
+    private $idRapport;
+
+    public function getIdEtapeprojet(): ?int
     {
-        return $this->projet;
+        return $this->idEtapeprojet;
     }
 
-    public function setProjet(?Projet $projet): self
+    public function getNometape(): ?string
     {
-        $this->projet = $projet;
+        return $this->nometape;
+    }
+
+    public function setNometape(string $nometape): static
+    {
+        $this->nometape = $nometape;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nomEtape = null;
-
-    public function getNomEtape(): ?string
-    {
-        return $this->nomEtape;
-    }
-
-    public function setNomEtape(string $nomEtape): self
-    {
-        $this->nomEtape = $nomEtape;
-        return $this;
-    }
-
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $description = null;
 
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $dateDebut = null;
-
-    public function getDateDebut(): ?\DateTimeInterface
+    public function getDatedebut(): ?\DateTimeInterface
     {
-        return $this->dateDebut;
+        return $this->datedebut;
     }
 
-    public function setDateDebut(?\DateTimeInterface $dateDebut): self
+    public function setDatedebut(?\DateTimeInterface $datedebut): static
     {
-        $this->dateDebut = $dateDebut;
+        $this->datedebut = $datedebut;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $dateFin = null;
-
-    public function getDateFin(): ?\DateTimeInterface
+    public function getDatefin(): ?\DateTimeInterface
     {
-        return $this->dateFin;
+        return $this->datefin;
     }
 
-    public function setDateFin(?\DateTimeInterface $dateFin): self
+    public function setDatefin(?\DateTimeInterface $datefin): static
     {
-        $this->dateFin = $dateFin;
+        $this->datefin = $datefin;
+
         return $this;
     }
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $statut = null;
 
     public function getStatut(): ?string
     {
         return $this->statut;
     }
 
-    public function setStatut(?string $statut): self
+    public function setStatut(?string $statut): static
     {
         $this->statut = $statut;
+
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', nullable: true)]
-    private ?float $montant = null;
-
-    public function getMontant(): ?float
+    public function getMontant(): ?string
     {
         return $this->montant;
     }
 
-    public function setMontant(?float $montant): self
+    public function setMontant(?string $montant): static
     {
         $this->montant = $montant;
+
         return $this;
     }
 
-    #[ORM\ManyToOne(targetEntity: Rapport::class, inversedBy: 'etapeprojets')]
-    #[ORM\JoinColumn(name: 'Id_rapport', referencedColumnName: 'id')]
-    private ?Rapport $rapport = null;
-
-    public function getRapport(): ?Rapport
+    public function getIdProjet(): ?Projet
     {
-        return $this->rapport;
+        return $this->idProjet;
     }
 
-    public function setRapport(?Rapport $rapport): self
+    public function setIdProjet(?Projet $idProjet): static
     {
-        $this->rapport = $rapport;
+        $this->idProjet = $idProjet;
+
         return $this;
     }
 
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'etapeprojet')]
-    private Collection $articles;
-
-    /**
-     * @return Collection<int, Article>
-     */
-    public function getArticles(): Collection
+    public function getIdRapport(): ?Rapport
     {
-        if (!$this->articles instanceof Collection) {
-            $this->articles = new ArrayCollection();
-        }
-        return $this->articles;
+        return $this->idRapport;
     }
 
-    public function addArticle(Article $article): self
+    public function setIdRapport(?Rapport $idRapport): static
     {
-        if (!$this->getArticles()->contains($article)) {
-            $this->getArticles()->add($article);
-        }
+        $this->idRapport = $idRapport;
+
         return $this;
     }
 
-    public function removeArticle(Article $article): self
-    {
-        $this->getArticles()->removeElement($article);
-        return $this;
-    }
-
-    #[ORM\OneToMany(targetEntity: Rapport::class, mappedBy: 'etapeprojet')]
-    private Collection $rapports;
-
-    public function __construct()
-    {
-        $this->articles = new ArrayCollection();
-        $this->rapports = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, Rapport>
-     */
-    public function getRapports(): Collection
-    {
-        if (!$this->rapports instanceof Collection) {
-            $this->rapports = new ArrayCollection();
-        }
-        return $this->rapports;
-    }
-
-    public function addRapport(Rapport $rapport): self
-    {
-        if (!$this->getRapports()->contains($rapport)) {
-            $this->getRapports()->add($rapport);
-        }
-        return $this;
-    }
-
-    public function removeRapport(Rapport $rapport): self
-    {
-        $this->getRapports()->removeElement($rapport);
-        return $this;
-    }
 
 }
